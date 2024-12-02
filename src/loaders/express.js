@@ -36,7 +36,7 @@ export default (app) => {
     return res.status(200).json({
       message:'Project is successfully working...',
       success: true
-    }).end();
+    });
   });
 
   // app.use((req, res, next) => {
