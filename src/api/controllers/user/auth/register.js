@@ -1,31 +1,41 @@
 import { User } from '../../../../models/index.js';
 
 export default async (req, res) => {
-  
-  const exists = await User.exists({ username: req.body.username })
-  .catch((err) => {
-    return res.status(500).json({message: "Faild to register user", success: false});
-  });
+    try {
+        // Check if user already exists
+        const exists = await User.exists({ username: req.body.username });
+        if (exists) {
+            return res.status(409).json({
+                message: "User already exists",
+                success: false,
+            });
+        }
 
-  if (exists) return res.status(409).json({message: "User already exists", success: false});
+        // Create new user
+        const user = new User({
+            email: req.body.email,
+            name: req.body.name,
+            username: req.body.username,
+            language: req.body.language,
+            platform: req.body.platform,
+            isPremium: req.body.isPremium,
+            timezone: req.body.timezone,
+            lastLogin: Date.now(),
+        });
 
-  let user = new User({
-    email: req.body.email,
-    name: req.body.name,
-    username: req.body.username,
-    language: req.body.language,
-    platform: req.body.platform,
-    isPremium: req.body.isPremium,
-    timezone: req.body.timezone,
-    lastLogin: Date.now()
-  });
+        // Save the user and handle potential errors
+        await user.save();
 
-  user = await user.save().catch((err) => {
-    return res.status(500).json({message: "Faild to register user", success: false});
-  });
-
-  return res.status(200).json({
-    message: "Successfully registered user",
-    success: true
-  });
+        // Send success response
+        return res.status(200).json({
+            message: "Successfully registered user",
+            success: true,
+        });
+    } catch (error) {
+        console.error("Error occurred:", error);
+        return res.status(500).json({
+            message: "Failed to register user",
+            success: false,
+        });
+    }
 };
