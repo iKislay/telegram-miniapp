@@ -19,7 +19,7 @@ export default (app) => {
     logger('00002', '', ex.message, 'Unhandled Rejection', '');
   });
 
-  app.enable('trust proxy');
+  // app.enable('trust proxy');
   app.use(cors());
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
