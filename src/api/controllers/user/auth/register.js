@@ -3,6 +3,7 @@ import { User } from '../../../../models/index.js';
 export default async (req, res) => {
     try {
         // Check if user already exists
+        if(!req.body.username) return res.status(500).json({message: "insufficient data", success: false})
         const exists = await User.exists({ username: req.body.username });
         if (exists) {
             return res.status(409).json({
