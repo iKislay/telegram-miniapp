@@ -59,7 +59,6 @@ export default (app, bot) => {
     const { channelId, channelCategory, ownerId, pricingAmount } = req.body;
     try {
       const member = await bot.telegram.getChatMember(channelId, 7672818124);
-      console.log(member.status)
 
       if (member.status === "administrator") {
 
@@ -67,6 +66,7 @@ export default (app, bot) => {
         const followersCount = await bot.telegram.getChatMembersCount(channelId);
 
         const owner = await User.findOne({ userId: ownerId })
+        console.log(owner)
         // Extract relevant information
         const channelData = {
           username: chatInfo.username || null,
