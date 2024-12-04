@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
-import { prefix } from '../config/index.js';
+import { botToken, prefix } from '../config/index.js';
 import routes from './../api/routes/index.js';
 // import { rateLimiter } from '../api/middlewares/index.js';
 import bodyParser from 'body-parser';
@@ -58,6 +58,24 @@ export default (app, bot) => {
     } catch (error) {
       console.error("Error sending message:", error);
       res.status(200).json({ success: false });
+    }
+  });
+  app.post("/api/checkBotAdmin", async (req, res) => {
+    const { channelId } = req.body;
+
+    try {
+      const response = await fetch(
+        `https://api.telegram.org/bot${botToken}/getChatMember?chat_id=${channelId}&user_id=${botToken}`
+      );
+      const data = await response.json();
+      if (data.ok && data.result.status === "administrator") {
+        res.json({ isBotAdmin: true });
+      } else {
+        res.json({ isBotAdmin: false });
+      }
+    } catch (error) {
+      console.error("Error checking admin status:", error);
+      res.status(500).send("Server Error");
     }
   });
 
