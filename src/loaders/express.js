@@ -58,7 +58,7 @@ export default (app, bot) => {
   app.post("/api/checkBotAdmin", async (req, res) => {
     const { channelId, channelCategory, ownerId, pricingAmount } = req.body;
     try {
-      const member = await bot.telegram.getChatMember(channelId, bot.options.token);
+      const member = await bot.telegram.getChatMember(channelId, 7672818124);
       console.log(member.status)
 
       if (member.status === "administrator") {
@@ -72,9 +72,6 @@ export default (app, bot) => {
           username: chatInfo.username || null,
           userId: chatInfo.id,
           name: chatInfo.title,
-          photoUrl: chatInfo.photo
-            ? `https://api.telegram.org/file/bot${botToken}/${chatInfo.photo.small_file_id}`
-            : null,
           category: channelCategory,
           description: chatInfo.description || null,
           owner: owner._id,
