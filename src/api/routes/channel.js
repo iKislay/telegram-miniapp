@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { register } from '../controllers/channel/index.js';
 
 const router = Router();
 

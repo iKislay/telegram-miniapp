@@ -8,7 +8,7 @@ import routes from './../api/routes/index.js';
 import bodyParser from 'body-parser';
 import logger from '../utils/logger.js';
 
-export default (app) => {
+export default (app, bot) => {
   // process.on('uncaughtException', async (error) => {
   //   // console.log(error);
   //   logger('00001', '', error.message, 'Uncaught Exception', '');
@@ -26,17 +26,39 @@ export default (app) => {
   app.use(morgan('dev'));
   app.use(helmet());
   app.use(express.static('public'));
-//   app.disable('x-powered-by');
-//   app.disable('etag');
+  //   app.disable('x-powered-by');
+  //   app.disable('etag');
 
-//   app.use(rateLimiter);
+  //   app.use(rateLimiter);
   app.use(prefix, routes);
 
   app.get('/', (_req, res) => {
     return res.status(200).json({
-      message:'Project is successfully working...',
+      message: 'Project is successfully working...',
       success: true
     });
+  });
+  app.post("/api/sendInlineMessage", async (req, res) => {
+    const { chatId, text } = req.body;
+    console.log(req.body)
+    try {
+      await bot.telegram.sendMessage(chatId, text, {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: "Add Bot to Channel",
+                url: "https://t.me/yourbot?startchannel",
+              },
+            ],
+          ],
+        },
+      });
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error("Error sending message:", error);
+      res.status(200).json({ success: false });
+    }
   });
 
   // app.use((req, res, next) => {

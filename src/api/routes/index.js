@@ -4,6 +4,6 @@ import channel from './channel.js';
 const router = Router();
 
 router.use('/user', user);
-router.use('/user', channel);
+router.use('/channel', channel);
 
 export default router;
