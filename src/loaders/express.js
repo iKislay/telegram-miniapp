@@ -8,6 +8,7 @@ import routes from './../api/routes/index.js';
 import bodyParser from 'body-parser';
 import logger from '../utils/logger.js';
 import Channel from '../models/channel.js';
+import User from '../models/user.js';
 
 export default (app, bot) => {
 
@@ -71,7 +72,7 @@ export default (app, bot) => {
         );
         const chatInfoData = await chatInfoResponse.json();
         const chatSubCountData = await chatSubCountResponse.json();
-
+        const owner = await User.findOne({ userId: ownerId })
         if (chatInfoData.ok && chatSubCountData.ok) {
           const chatInfo = chatInfoData.result;
           const followersCount = chatSubCountData.result
@@ -85,9 +86,9 @@ export default (app, bot) => {
               : null,
             category: channelCategory,
             description: chatInfo.description || null,
-            owner: ownerId, 
-            stats: {followersCount},
-            pricing: {amount: pricingAmount}
+            owner: owner._id,
+            stats: { followersCount },
+            pricing: { amount: pricingAmount }
           };
 
           // Save to database
