@@ -3,8 +3,8 @@ import { User } from '../../../../models/index.js';
 export default async (req, res) => {
     try {
         // Check if user already exists
-        if(!req.body.username) return res.status(500).json({message: "insufficient data", success: false})
-        const exists = await User.exists({ username: req.body.username });
+        if(!req.body.userId) return res.status(500).json({message: "insufficient data", success: false})
+        const exists = await User.exists({ userId: req.body.userId });
         if (exists) {
             return res.status(409).json({
                 message: "User already exists",
@@ -16,7 +16,7 @@ export default async (req, res) => {
         const user = new User({
             email: req.body.email,
             name: req.body.name,
-            username: req.body.username,
+            userId: req.body.userId,
             language: req.body.language,
             platform: req.body.platform,
             isPremium: req.body.isPremium,
