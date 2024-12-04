@@ -38,7 +38,7 @@ const channelSchema = new Schema({
   //NOTE: To check whether the account is active or not. When user deletes the account, you can store the information anonymously.
   isActivated: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   pricing: {
     type: {

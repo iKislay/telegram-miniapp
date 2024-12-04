@@ -55,7 +55,7 @@ export default (app, bot) => {
   });
 
   app.post("/api/checkBotAdmin", async (req, res) => {
-    const { channelId, ownerId, pricingAmount } = req.body;
+    const { channelId, channelCategory, ownerId, pricingAmount } = req.body;
     try {
       const response = await fetch(
         `https://api.telegram.org/bot${botToken}/getChatMember?chat_id=${channelId}&user_id=${botToken}`
@@ -83,6 +83,7 @@ export default (app, bot) => {
             photoUrl: chatInfo.photo
               ? `https://api.telegram.org/file/bot${botToken}/${chatInfo.photo.small_file_id}`
               : null,
+            category: channelCategory,
             description: chatInfo.description || null,
             owner: ownerId, 
             stats: {followersCount},
