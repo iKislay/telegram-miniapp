@@ -56,7 +56,7 @@ export default (app, bot) => {
   });
 
   app.post("/api/checkBotAdmin", async (req, res) => {
-    const { channelId, channelCategory, ownerId, pricingAmount } = req.body;
+    const { channelId, channelCategory, OwnerId, pricingAmount } = req.body;
     try {
       const member = await bot.telegram.getChatMember(channelId, 7672818124);
 
@@ -65,7 +65,7 @@ export default (app, bot) => {
         const chatInfo = await bot.telegram.getChat(channelId);
         const followersCount = await bot.telegram.getChatMembersCount(channelId);
 
-        const owner = await User.findOne({ userId: ownerId })
+        const owner = await User.findOne({ userId: OwnerId })
         console.log(owner)
         // Extract relevant information
         const channelData = {
