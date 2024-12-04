@@ -7,17 +7,10 @@ import routes from './../api/routes/index.js';
 // import { rateLimiter } from '../api/middlewares/index.js';
 import bodyParser from 'body-parser';
 import logger from '../utils/logger.js';
+import Channel from '../models/channel.js';
 
 export default (app, bot) => {
-  // process.on('uncaughtException', async (error) => {
-  //   // console.log(error);
-  //   logger('00001', '', error.message, 'Uncaught Exception', '');
-  // });
 
-  // process.on('unhandledRejection', async (ex) => {
-  //   // console.log(ex);
-  //   logger('00002', '', ex.message, 'Unhandled Rejection', '');
-  // });
 
   // app.enable('trust proxy');
   app.use(cors());
@@ -60,16 +53,50 @@ export default (app, bot) => {
       res.status(200).json({ success: false });
     }
   });
-  app.post("/api/checkBotAdmin", async (req, res) => {
-    const { channelId } = req.body;
 
+  app.post("/api/checkBotAdmin", async (req, res) => {
+    const { channelId, ownerId, pricingAmount } = req.body;
     try {
       const response = await fetch(
         `https://api.telegram.org/bot${botToken}/getChatMember?chat_id=${channelId}&user_id=${botToken}`
       );
       const data = await response.json();
       if (data.ok && data.result.status === "administrator") {
-        res.json({ isBotAdmin: true });
+
+        const chatInfoResponse = await fetch(
+          `https://api.telegram.org/bot${botToken}/getChat?chat_id=${channelId}`
+        );
+        const chatSubCountResponse = await fetch(
+          `https://api.telegram.org/bot${botToken}/getChatMemberCount?chat_id=${channelId}`
+        );
+        const chatInfoData = await chatInfoResponse.json();
+        const chatSubCountData = await chatSubCountResponse.json();
+
+        if (chatInfoData.ok && chatSubCountData.ok) {
+          const chatInfo = chatInfoData.result;
+          const followersCount = chatSubCountData.result
+          // Extract relevant information
+          const channelData = {
+            username: chatInfo.username || null,
+            userId: chatInfo.id,
+            name: chatInfo.title,
+            photoUrl: chatInfo.photo
+              ? `https://api.telegram.org/file/bot${botToken}/${chatInfo.photo.small_file_id}`
+              : null,
+            description: chatInfo.description || null,
+            owner: ownerId, 
+            stats: {followersCount},
+            pricing: {amount: pricingAmount}
+          };
+
+          // Save to database
+          const channel = new Channel(channelData);
+          await channel.save();
+
+          res.json({ isBotAdmin: true, message: "Channel info saved successfully." });
+        } else {
+          res.status(500).json({ isBotAdmin: true, message: "Failed to fetch channel info." });
+        }
       } else {
         res.json({ isBotAdmin: false });
       }
