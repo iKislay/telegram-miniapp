@@ -12,6 +12,10 @@ const userSchema = new Schema({
     type: Number, required: true, unique: true
   },
   
+  balance: {
+    type: Number, default: 0
+  },
+  
   name: {
     type: String, required: true
   },

@@ -6,10 +6,9 @@ import { botToken, prefix } from '../config/index.js';
 import routes from './../api/routes/index.js';
 // import { rateLimiter } from '../api/middlewares/index.js';
 import bodyParser from 'body-parser';
-import logger from '../utils/logger.js';
 import Channel from '../models/channel.js';
 import User from '../models/user.js';
-
+import { tgLogger } from '../utils/index.js';
 export default (app, bot) => {
 
 
@@ -32,6 +31,15 @@ export default (app, bot) => {
       success: true
     });
   });
+  app.get('/a/tes', async (_req, res) => {
+    await tgLogger(bot, `
+      new channel added
+      `)
+    return res.status(200).json({
+      message: 'Project is successfully working...',
+      success: true
+    });
+  });
   app.post("/api/sendInlineMessage", async (req, res) => {
     const { chatId, text } = req.body;
     console.log(req.body)
@@ -42,7 +50,7 @@ export default (app, bot) => {
             [
               {
                 text: "Add Bot to Channel",
-                url: "https://t.me/yourbot?startchannel",
+                url: "https://t.me/highsector?earn",
               },
             ],
           ],
@@ -66,8 +74,7 @@ export default (app, bot) => {
         const followersCount = await bot.telegram.getChatMembersCount(channelId);
 
         const owner = await User.findOne({ userId: OwnerId })
-        console.log(owner)
-        // Extract relevant information
+
         const channelData = {
           username: chatInfo.username || null,
           userId: chatInfo.id,
@@ -79,10 +86,17 @@ export default (app, bot) => {
           pricing: { amount: pricingAmount }
         };
 
-        // Save to database
         const channel = new Channel(channelData);
         await channel.save();
-
+        await tgLogger(bot, `
+          new channel added
+          username - ${chatInfo.username} (${chatInfo.id})
+          Name - ${chatInfo.title}
+          Subs - ${followersCount}
+          Owner - tg://user?id=${OwnerId}
+          Category - ${channelCategory}
+          Pricing - $${pricingAmount}/hour
+          `)
         res.json({ isBotAdmin: true, message: "Channel info saved successfully." });
 
       } else {
