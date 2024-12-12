@@ -1,4 +1,4 @@
-import { User } from "../../../../models/index.js";
+import { User } from "../../../models/index.js";
 import mongoose from "mongoose";
 
 // Utility: Send a standardized success response
@@ -41,7 +41,10 @@ export const banUser = async (req, res) => {
 	try {
 		const user = await User.findByIdAndUpdate(
 			userId,
-			{ isBanned: true, banReason: reason },
+			{
+				isBanned: true,
+				$push: { banReason: reason },
+			},
 			{ new: true }
 		);
 		if (!user) {
@@ -73,7 +76,10 @@ export const bulkBanUsers = async (req, res) => {
 	try {
 		const result = await User.updateMany(
 			{ _id: { $in: userIds } },
-			{ isBanned: true, banReason: reason }
+			{
+				isBanned: true,
+				$push: { banReason: reason },
+			}
 		);
 		if (result.modifiedCount === 0) {
 			return sendErrorResponse(res, null, "No users were updated", 404);
@@ -95,7 +101,7 @@ export const unbanUser = async (req, res) => {
 	try {
 		const user = await User.findByIdAndUpdate(
 			userId,
-			{ isBanned: false, banReason: null },
+			{ isBanned: false },
 			{ new: true }
 		);
 		if (!user) {

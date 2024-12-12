@@ -66,7 +66,8 @@ const userSchema = new Schema(
 			default: false,
 		},
 		banReason: {
-			type: String,
+			type: [String],
+			default: [],
 		},
 		isVerified: {
 			type: Boolean,
